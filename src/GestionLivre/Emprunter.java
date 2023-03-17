@@ -2,6 +2,7 @@ package GestionLivre;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Emprunter {
@@ -31,75 +32,68 @@ public class Emprunter {
         Scanner value = new Scanner(System.in);
 
         System.out.println("Saisissez le nom de l'emprunter : ");
-        arrayEmprunter.add(setNom(value.nextLine()));
+        setNom(value.nextLine());
 
         System.out.println("Saisissez la date de naissance de l'emprunter : (jj/mm/aaaa)");
-        arrayEmprunter.add(setDateNaissance((value.nextLine())));
+        setDateNaissance(value.nextLine());
 
-        try {
-            FileOutputStream fileOut = new FileOutputStream("Emprunter");
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(arrayEmprunter);
-            fileOut.close();
-            System.out.println("\nSerialisation terminée avec succès...\n");
+        arrayEmprunter.add(getNom()+" ,"+getDateNaissance());
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        for(String add : arrayEmprunter)
+        {
+            writeInFile("emprunter.csv", add, true);
         }
     }
 
-    public void dataEmprunter()
-    {
-        ArrayList<String> arrayEmprunter = new ArrayList<>();
+    public static void writeInFile(String file, String inputString, boolean append){
+
+        try(FileWriter fw = new FileWriter(file, append);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw))
+        {
+            out.println(inputString);
+        } catch (IOException e) {
+            //exception handling left as an exercise for the reader
+        }
+    }
+
+    public void modifierEmprunter() throws IOException {
+        Scanner value = new Scanner(System.in);
+        ArrayList<String> changeData = new ArrayList<>();
+        System.out.println("Choisissez le client à modifier :");
 
         // Lecture du fichier 'test'
-        try {
-            FileInputStream fileIn = new FileInputStream("Emprunter");
-            ObjectInputStream ois = new ObjectInputStream(fileIn);
-            arrayEmprunter = (ArrayList) ois.readObject();
-            ois.close();
-            fileIn.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        FileReader fr = new FileReader("emprunter.csv");
+        BufferedReader br = new BufferedReader(fr);
+
+        String line = new String();
+
+        int nbrLine = Integer.parseInt(value.nextLine());
+        for (int i = 1; i < 20; i++) {
+            if (i == nbrLine) {
+                line = br.readLine();
+                String[] caract = line.split(",");
+                changeData.addAll(Arrays.asList(caract));
+                // System.out.println(caract[0]);
+            } else {
+                br.readLine();
+            }
         }
 
-        System.out.println("\n Emprunter: \n");
-        for(String o:arrayEmprunter)
-            System.out.println("- " + o);
+        System.out.println("modifier le nom du client : ");
+        setNom(value.nextLine());
+
+        System.out.println("Modifier la date de naissance : ");
+        setDateNaissance(value.nextLine());
+
+        changeData.set(0, getNom());
+        changeData.set(1, getDateNaissance());
+
+        for (String a : changeData) {
+            System.out.println(a);
+        }
     }
 
-    public void modifierEmprunter()
-    {
-        ArrayList<String> arrayEmprunter = new ArrayList<>();
-        Scanner value = new Scanner(System.in);
 
-        System.out.println("Saisissez le nom du client : ");
-        arrayEmprunter.set(0, setNom(value.nextLine()));
 
-        System.out.println("Saisissez la date de naissance du client : ");
-        arrayEmprunter.set(1, setNom(value.nextLine()));
-    }
-
-    public void modifierNom()
-    {
-        ArrayList<String> arrayEmprunter = new ArrayList<>();
-        Scanner value = new Scanner(System.in);
-
-        System.out.println("Saisissez le nom du livre : ");
-        arrayEmprunter.set(0, setNom(value.nextLine()));
-    }
-
-    public void modifierDateNaissance()
-    {
-        ArrayList<String> arrayEmprunter = new ArrayList<>();
-        Scanner value = new Scanner(System.in);
-
-        System.out.println("Saisissez la date de naissance du client : ");
-        arrayEmprunter.set(1, setNom(value.nextLine()));
-    }
 }
